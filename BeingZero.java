@@ -55,6 +55,10 @@ class ConsistentHashing{
         }
     }
 
+    public void addServer(String serverIP){
+        addServer(new Server(serverIP));
+    }
+
     public void addServer(Server server){
         for(int i=0;i<numberOfVirtualNodes;i++){
             String serverVirtualNode = server.getIPAddress() + i;
@@ -95,8 +99,17 @@ class ConsistentHashing{
 public class BeingZero{
     static Scanner sc = new Scanner(System.in);
     static final int EXIT = 5;
+    static final int VNODES_COUNT = 100;
+    static Set<String> keySet = new HashSet<>();
+    static ConsistentHashing ch;
+
+    static void printKeyMapping(){
+        for(String k : keySet){
+            System.out.printf("\n\tKey '%s', Server '%s'", k, ch.get(k));
+        }
+    }
     static int showMenu(){
-        System.out.printf("\tMENU\n");
+        System.out.printf("\n\n\tMENU\n");
         System.out.printf("\t==========\n\n");
         System.out.printf("\t1.  Add Server\n");
         System.out.printf("\t2.  Remove Server\n");
@@ -115,13 +128,25 @@ public class BeingZero{
         System.out.printf("\n\tEnter Key to be Located: ");
         return sc.nextLine().trim();
     }
+
+    static void seedData(){
+        String serverIPS[]  = {"198.168.1.1", "198.168.1.2", "198.168.1.3", "198.168.1.4"};
+        String keys[]  = {"a", "b", "c", "d", "e", "f", "g" ,"h", "i", "j"};
+        for(String ip : serverIPS)
+            ch.addServer(ip);
+        for(String k : keys)
+            keySet.add(k);
+        printKeyMapping();
+    }
     public static void main(String args[]){
         int choice;
         Server server;
         String key;
 
-        ConsistentHashing ch = new ConsistentHashing(100);
+        ch = new ConsistentHashing(VNODES_COUNT);
 
+        seedData();
+        
         while((choice = showMenu()) !=EXIT){
             switch(choice){
                 case 1:
@@ -139,6 +164,7 @@ public class BeingZero{
                     break;
                 case 4:
                     key = getKey();
+                    keySet.add(key);
                     server = ch.get(key);
                     System.out.printf("\n\tKey '%s' located on Server '%s'\n", key, server);
                     break;
@@ -148,6 +174,7 @@ public class BeingZero{
                 default:
                     System.out.println("\n\tWrong Choice!! Try Again!!");
             }
+            printKeyMapping();
         }
     }
 }
